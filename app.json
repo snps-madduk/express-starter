@@ -17,9 +17,6 @@
       "description": "Secret key for JWT",
       "generator": "secret"
     },
-    "DB_FILE": {
-      "description": "SQLite database File"
-    },
     "REDIS_URI": {
       "description": "PostgreSQL database name",
       "value": "redis://username:password@host:6379"
