@@ -1,20 +1,12 @@
 import 'dotenv/config';
 
-const {
-  DB_HOST, DB_PORT = 5432, DB_NAME, DB_USER, DB_PASSWORD,
-} = process.env;
+// const {
+//   DB_FILE,
+// } = process.env;
 
 const defaultConfig = {
-  dialect: 'postgres',
-  timezone: '+03:00',
-  username: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_NAME,
-  host: DB_HOST,
-  port: Number(DB_PORT),
-  define: {
-    paranoid: true,
-  },
+  dialect: 'sqlite',
+  storage: 'sqlite.db',
 };
 
 export const development = {

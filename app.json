@@ -17,22 +17,6 @@
       "description": "Secret key for JWT",
       "generator": "secret"
     },
-    "DB_HOST": {
-      "description": "PostgreSQL database host"
-    },
-    "DB_PORT": {
-      "description": "PostgreSQL database port",
-      "value": "5432"
-    },
-    "DB_USER": {
-      "description": "PostgreSQL database user"
-    },
-    "DB_PASSWORD": {
-      "description": "PostgreSQL database user password"
-    },
-    "DB_NAME": {
-      "description": "PostgreSQL database name"
-    },
     "REDIS_URI": {
       "description": "PostgreSQL database name",
       "value": "redis://username:password@host:6379"

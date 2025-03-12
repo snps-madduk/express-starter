@@ -1,0 +1,90 @@
+name: Express-Starter CI workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+  pull_request:
+    types: [opened]
+
+jobs:
+
+  helmLint:
+    if: github.ref != 'refs/heads/main'
+    uses: synopsys-inc/sce-ci-templates/.github/workflows/helm.yaml@main
+    secrets: inherit
+    with:           
+      enable_helm_lint: true
+      runner_tag: express-starter-runner
+      docker_images: express-starter
+      helm_chart_name: express-starter
+      helm_chart_location: helm
+      container_image: "us01-harbor.internal.synopsys.com/sce-baseimages-docker/pliny-runner:0.0.26"
+
+  # Version creation
+  version:
+    if: github.ref == 'refs/heads/main'
+    uses: synopsys-inc/sce-ci-templates/.github/workflows/version.yaml@main
+    secrets: inherit
+    with: 
+      enable_create_version: true
+      runner_tag: express-starter-runner
+  
+  # Create Docker image
+  publish-docker-image:
+    if: github.ref == 'refs/heads/main'
+    uses: synopsys-inc/sce-ci-templates/.github/workflows/docker.yaml@main
+    with:
+      runner_tag: express-starter-runner
+      docker_version: ${{needs.version.outputs.new_version}}
+      docker_image_name: express-starter
+    secrets: inherit
+    needs:
+    - version
+
+  # Publish Helm Chart
+  publish-helmchart:
+    if: github.ref == 'refs/heads/main'
+    uses: synopsys-inc/sce-ci-templates/.github/workflows/helm.yaml@main
+    secrets: inherit
+    with:
+      runner_tag: express-starter-runner
+      enable_build_helm: true
+      docker_images: "us01-harbor.internal.synopsys.com/backstage-test/express-starter"
+      helm_chart_name: express-starter
+      helm_chart_location: helm
+      helm_version: ${{needs.version.outputs.new_version}}
+      container_image: "us01-harbor.internal.synopsys.com/sce-baseimages-docker/pliny-runner:0.0.26"
+    needs:
+    - version
+    - publish-docker-image
+
+  # update version:
+  updateVersion:
+    if: github.ref == 'refs/heads/main'
+    uses: synopsys-inc/sce-ci-templates/.github/workflows/version.yaml@main
+    secrets: inherit
+    with:
+      enable_update_version: true
+      runner_tag: express-starter-runner
+      new_version: ${{needs.version.outputs.new_version}}
+    needs:
+    - version
+    - publish-docker-image
+    - publish-helmchart
+
+  ###########
+  # sca_sast_scan:
+  #   if: github.ref == 'refs/heads/main'
+  #   uses: synopsys-inc/sce-ci-templates/.github/workflows/scan.yaml@main
+  #   secrets: inherit
+  #   with:
+  #     runner_tag: express-starter-runner
+  #     enable_blackduck_sca: true
+  #     enable_polaris_sast: true
+  #     polaris_assessment_types: "SAST"
+      
+  
+    
+    

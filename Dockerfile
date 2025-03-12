@@ -12,6 +12,8 @@ COPY . .
 
 RUN yarn run build
 
+RUN yarn run db:migrate
+
 # Production image
 FROM node:16-alpine
 
@@ -23,6 +25,8 @@ WORKDIR /usr/src/app
 RUN yarn install --prod
 
 COPY --from=builder /app/dist/ ./dist/
+
+COPY --from=builder /app/sqlite.db ./sqlite.db
 
 COPY swagger.json ./
 
